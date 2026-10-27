@@ -75,6 +75,20 @@
   .big { font-size: clamp(1.6rem, 7vw, 2.4rem); font-weight: 800; margin-top: 10px; }
   .gold { color: var(--gold); }
 
+  /* finale: dollar rain + redeem steps */
+  #p5 { overflow-y: auto; justify-content: safe center; }
+  .rain { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: -1; }
+  .drop { position: absolute; top: -14vh; font-weight: 800; color: #5be37d; text-shadow: 0 0 10px rgba(91,227,125,.55);
+    animation: fall linear forwards; will-change: transform; }
+  @keyframes fall { to { transform: translateY(125vh) rotate(var(--rot)); } }
+  #t5 .card { width: fit-content; margin-left: auto; margin-right: auto; }
+  .steps { margin: 18px auto 0; padding: 14px 18px 14px 14px; max-width: 420px; text-align: left; border-radius: 16px;
+    background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.18); font-size: .95rem; line-height: 1.45; }
+  .steps h3 { margin: 0 0 6px 4px; font-size: 1rem; }
+  .steps ol { margin: 0; padding-left: 22px; }
+  .steps li { margin: 4px 0; }
+  .steps b { color: var(--gold); }
+
   canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
 </style>
 </head>
@@ -118,10 +132,22 @@
 
 <!-- 5: finale -->
 <section class="page center" id="p5">
-  <p class="big" style="margin-bottom:26px">Sorry, we ain't rich nor stupid 😌</p>
+  <div class="rain" id="rain" aria-hidden="true"></div>
+  <p class="big" style="margin-bottom:14px">Sorry, we ain't rich nor stupid 😌</p>
   <p class="line">Happy Birthday! 🎉</p>
-  <p class="line" style="margin-top:12px">Enjoy the <span class="gold">$50</span> Uber gift card</p>
-  <div class="card"><div class="brand">Uber</div><div class="amt">$50</div><div class="sub">gift card</div></div>
+  <div class="reveal" id="t5">
+    <p class="line" style="margin-top:14px">Enjoy the <span class="gold">$50</span> Uber gift card</p>
+    <div class="card"><div class="brand">Uber</div><div class="amt">$50</div><div class="sub">gift card</div></div>
+    <div class="steps">
+      <h3>How to redeem</h3>
+      <p style="margin:0 0 6px 4px">Open the latest version of the <b>Uber app</b> or <b>Uber Eats app</b>.</p>
+      <ol>
+        <li>Tap the <b>Account</b> icon, then tap <b>Wallet</b>.</li>
+        <li>Tap <b>+ Gift Card</b>, then <b>Enter Gift Code</b>.</li>
+        <li>Enter the gift code and confirm to add the value to your <b>Uber Cash</b>.</li>
+      </ol>
+    </div>
+  </div>
 </section>
 
 <canvas id="confetti"></canvas>
@@ -153,7 +179,10 @@
       setTimeout(function () { $('#t3b').classList.add('show'); }, 2200);
       setTimeout(function () { $('#redeem1').classList.add('show'); }, 3800);
     }
-    if (id === 'p5') { burst(); setTimeout(burst, 900); setTimeout(burst, 1800); }
+    if (id === 'p5') {
+      startRain();
+      setTimeout(function () { $('#t5').classList.add('show'); burst(); }, 5000);
+    }
   }
 
   // page 1 -> 2
@@ -173,6 +202,23 @@
 
   $('#redeem1').addEventListener('click', function () { go('p4'); });
   $('#redeem2').addEventListener('click', function () { go('p5'); });
+
+  // dollar rain
+  function startRain() {
+    var rain = $('#rain'), glyphs = ['$', '$', '$', '💵', '💸'], t0 = Date.now();
+    (function drop() {
+      if (Date.now() - t0 > 9000) return;
+      var d = document.createElement('span'), g = glyphs[(Math.random() * glyphs.length) | 0];
+      d.className = 'drop'; d.textContent = g;
+      d.style.left = (Math.random() * 96) + 'vw';
+      d.style.fontSize = (18 + Math.random() * 34) + 'px';
+      d.style.setProperty('--rot', ((Math.random() - .5) * 120) + 'deg');
+      d.style.animationDuration = (2.6 + Math.random() * 2.4) + 's';
+      rain.appendChild(d);
+      setTimeout(function () { d.remove(); }, 5500);
+      setTimeout(drop, 70);
+    })();
+  }
 
   // confetti
   var cv = $('#confetti'), ctx = cv.getContext('2d'), bits = [], running = false;
