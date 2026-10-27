@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Happy Birthday 🎂</title>
+<style>
+  :root {
+    --bg: #14091f;
+    --ink: #fff;
+    --gold: #ffd36b;
+    --pink: #ff5fa2;
+    --uber: #000;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
+    font-family: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif; overflow: hidden; }
+
+  .page { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center;
+    justify-content: flex-end; text-align: center; padding: 24px 20px calc(28px + env(safe-area-inset-bottom));
+    opacity: 0; visibility: hidden; transition: opacity .7s ease, visibility .7s; }
+  .page.active { opacity: 1; visibility: visible; }
+
+  .bg { position: absolute; inset: 0; background-size: cover; background-position: center; z-index: -2; }
+  .bg::after { content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(10,4,20,.15) 0%, rgba(10,4,20,.35) 40%, rgba(10,4,20,.88) 100%); }
+  .bg.dim::after { background: rgba(10,4,20,.72); }
+
+  h1, h2, p { margin: 0; }
+  .line { font-size: clamp(1.35rem, 5.4vw, 2rem); font-weight: 700; line-height: 1.25; text-shadow: 0 2px 14px rgba(0,0,0,.6); max-width: 520px; }
+  .small { font-size: 1rem; opacity: .85; margin-top: 10px; }
+  .hint { margin-top: 18px; font-size: .95rem; letter-spacing: .08em; text-transform: uppercase; opacity: .8;
+    animation: pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .3; transform: scale(.97); } }
+
+  /* candles */
+  .candles { display: grid; grid-template-columns: repeat(9, 1fr); gap: 14px 6px; width: min(94vw, 460px); margin-bottom: 22px; }
+  .candle { position: relative; height: 54px; border: 0; background: none; padding: 0; cursor: pointer; }
+  .candle .stick { position: absolute; bottom: 0; left: 50%; width: 9px; height: 30px; margin-left: -4.5px; border-radius: 2px;
+    background: repeating-linear-gradient(135deg, #fff 0 5px, var(--pink) 5px 10px); }
+  .candle .flame { position: absolute; bottom: 28px; left: 50%; width: 12px; height: 20px; margin-left: -6px;
+    background: radial-gradient(ellipse at 50% 70%, #fff6c4 0%, #ffc43d 45%, #ff7a18 80%, transparent 100%);
+    border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%; transform-origin: 50% 100%;
+    box-shadow: 0 0 14px 5px rgba(255,170,50,.55); animation: flicker .35s ease-in-out infinite alternate; }
+  .candle:nth-child(3n) .flame { animation-duration: .27s; }
+  .candle:nth-child(3n+1) .flame { animation-duration: .43s; }
+  @keyframes flicker { from { transform: scale(1,1) rotate(-3deg); } to { transform: scale(.88,1.12) rotate(3deg); } }
+  .candle.out .flame { animation: none; opacity: 0; transform: scale(.2); transition: all .25s; }
+  .candle .smoke { position: absolute; bottom: 44px; left: 50%; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%;
+    background: rgba(220,220,230,.8); opacity: 0; }
+  .candle.out .smoke { animation: smoke 1.4s ease-out forwards; }
+  @keyframes smoke { 0% { opacity: .8; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-46px) scale(4); } }
+  .counter { font-size: 1.1rem; font-weight: 600; margin-top: 4px; min-height: 1.6em; }
+
+  /* reveal */
+  .reveal { opacity: 0; transform: translateY(14px); transition: opacity .8s ease, transform .8s ease; }
+  .reveal.show { opacity: 1; transform: none; }
+
+  .card { margin-top: 18px; padding: 18px 26px; border-radius: 20px; background: var(--uber); color: #fff;
+    border: 1px solid rgba(255,255,255,.25); box-shadow: 0 10px 40px rgba(0,0,0,.6); }
+  .card .brand { font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; }
+  .card .amt { font-size: clamp(2.6rem, 14vw, 4rem); font-weight: 800; line-height: 1.05; }
+  .card .sub { font-size: .85rem; opacity: .7; }
+
+  .btn { margin-top: 20px; padding: 14px 32px; border: 0; border-radius: 999px; background: #fff; color: #000;
+    font-weight: 700; font-size: 1.05rem; font-family: inherit; cursor: pointer; box-shadow: 0 6px 24px rgba(0,0,0,.45);
+    animation: bob 1.6s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translateY(-4px) scale(1.04); } }
+
+  /* clown + finale pages */
+  .center { justify-content: center; background: radial-gradient(circle at 50% 30%, #3b1659, var(--bg) 70%); }
+  .clown { font-size: clamp(8rem, 40vw, 13rem); line-height: 1; animation: wobble 1.2s ease-in-out infinite; }
+  @keyframes wobble { 0%,100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg) scale(1.06); } }
+  .big { font-size: clamp(1.6rem, 7vw, 2.4rem); font-weight: 800; margin-top: 10px; }
+  .gold { color: var(--gold); }
+
+  canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+</style>
+</head>
+<body>
+
+<!-- 1: photo + 27 lit candles -->
+<section class="page active" id="p1" data-next="p2">
+  <div class="bg" style="background-image:url(photo1.jpg); background-position:center 20%"></div>
+  <div class="candles" data-lit></div>
+  <p class="line">You are too pretty to take a bus to work, but we are too poor to buy you a car.</p>
+  <p class="hint">tap to continue</p>
+</section>
+
+<!-- 2: blow the candles -->
+<section class="page" id="p2">
+  <div class="bg dim" style="background-image:url(photo1.jpg); background-position:center 20%"></div>
+  <h2 class="line" style="margin-bottom:24px">Blow the candles 🎂</h2>
+  <div class="candles" id="blowCandles"></div>
+  <p class="counter" id="counter">27 left — tap each one</p>
+</section>
+
+<!-- 3: second photo + uber $5 -->
+<section class="page" id="p3">
+  <div class="bg" style="background-image:url(photo2.jpg); background-position:center 40%"></div>
+  <div class="card reveal" id="t3a">
+    <div class="brand">Uber</div>
+    <div class="amt">$5</div>
+    <div class="sub">gift card</div>
+  </div>
+  <p class="line reveal" id="t3b" style="margin-top:18px">But u r also too chic for this…</p>
+  <button class="btn reveal" id="redeem1">Tap to redeem</button>
+</section>
+
+<!-- 4: clown -->
+<section class="page center" id="p4">
+  <div class="clown">🤡</div>
+  <p class="big">JK, take ur <span class="gold">$500</span> Uber gift card</p>
+  <div class="card"><div class="brand">Uber</div><div class="amt">$500</div><div class="sub">gift card</div></div>
+  <button class="btn" id="redeem2">Tap to redeem</button>
+</section>
+
+<!-- 5: finale -->
+<section class="page center" id="p5">
+  <p class="big" style="margin-bottom:26px">Sorry, we ain't rich nor stupid 😌</p>
+  <p class="line">Happy Birthday! 🎉</p>
+  <p class="line" style="margin-top:12px">Enjoy the <span class="gold">$50</span> Uber gift card</p>
+  <div class="card"><div class="brand">Uber</div><div class="amt">$50</div><div class="sub">gift card</div></div>
+</section>
+
+<canvas id="confetti"></canvas>
+
+<script>
+(function () {
+  var $ = function (s) { return document.querySelector(s); };
+  var TOTAL = 27;
+
+  function buildCandles(el, interactive) {
+    for (var i = 0; i < TOTAL; i++) {
+      var c = document.createElement(interactive ? 'button' : 'div');
+      c.className = 'candle';
+      if (interactive) c.setAttribute('aria-label', 'Candle ' + (i + 1));
+      c.innerHTML = '<span class="stick"></span><span class="flame"></span><span class="smoke"></span>';
+      el.appendChild(c);
+    }
+  }
+  buildCandles($('#p1 .candles'), false);
+  buildCandles($('#blowCandles'), true);
+
+  var current = 'p1';
+  function go(id) {
+    $('#' + current).classList.remove('active');
+    $('#' + id).classList.add('active');
+    current = id;
+    if (id === 'p3') {
+      setTimeout(function () { $('#t3a').classList.add('show'); }, 400);
+      setTimeout(function () { $('#t3b').classList.add('show'); }, 2200);
+      setTimeout(function () { $('#redeem1').classList.add('show'); }, 3800);
+    }
+    if (id === 'p5') { burst(); setTimeout(burst, 900); setTimeout(burst, 1800); }
+  }
+
+  // page 1 -> 2
+  $('#p1').addEventListener('click', function () { go('p2'); });
+
+  // page 2: blow candles
+  var left = TOTAL;
+  $('#blowCandles').addEventListener('click', function (e) {
+    var c = e.target.closest('.candle');
+    if (!c || c.classList.contains('out')) return;
+    c.classList.add('out');
+    left--;
+    $('#counter').textContent = left ? left + ' left — tap each one' : 'Make a wish… ✨';
+    if (navigator.vibrate) navigator.vibrate(15);
+    if (!left) setTimeout(function () { go('p3'); }, 1500);
+  });
+
+  $('#redeem1').addEventListener('click', function () { go('p4'); });
+  $('#redeem2').addEventListener('click', function () { go('p5'); });
+
+  // confetti
+  var cv = $('#confetti'), ctx = cv.getContext('2d'), bits = [], running = false;
+  function size() { cv.width = innerWidth; cv.height = innerHeight; }
+  size(); addEventListener('resize', size);
+  function burst() {
+    var colors = ['#ff5fa2', '#ffd36b', '#6be3ff', '#9b7bff', '#fff'];
+    for (var i = 0; i < 140; i++) bits.push({
+      x: Math.random() * cv.width, y: -20 - Math.random() * 200, vx: (Math.random() - .5) * 3,
+      vy: 2 + Math.random() * 4, r: 4 + Math.random() * 6, a: Math.random() * 6, va: (Math.random() - .5) * .3,
+      c: colors[(Math.random() * colors.length) | 0] });
+    if (!running) { running = true; requestAnimationFrame(tick); }
+  }
+  function tick() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    bits = bits.filter(function (b) { return b.y < cv.height + 20; });
+    bits.forEach(function (b) {
+      b.x += b.vx; b.y += b.vy; b.a += b.va;
+      ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.a); ctx.fillStyle = b.c;
+      ctx.fillRect(-b.r / 2, -b.r / 4, b.r, b.r / 2); ctx.restore();
+    });
+    if (bits.length) requestAnimationFrame(tick); else running = false;
+  }
+})();
+</script>
+</body>
+</html>
